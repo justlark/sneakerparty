@@ -34,6 +34,16 @@ mail_service = "none"
 # For example:
 # creator_email_addresses = ["test@test.com", "admin@test.com"]
 creator_email_addresses = []
+# If set, visitors are sent to this other Gathio instance when they want to
+# create an event here. Useful alongside creator_email_addresses: people who
+# aren't permitted to create events here get pointed somewhere they can,
+# instead of requesting a magic link which will never arrive. The home page
+# redirects there (unless show_public_event_list is on, in which case the
+# public list remains the home page), and the 'Create an event' button links
+# there. Must be an absolute http(s) URL. '/new' still works on this instance,
+# so permitted creators can still request a magic link there.
+# For example:
+# redirect_to_instance = "https://gath.io"
 
 [database]
 # Set up for a locally running MongoDB connection. Change this to

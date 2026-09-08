@@ -4,6 +4,7 @@ import { marked } from "marked";
 import { markdownToSanitizedHTML, renderPlain } from "../util/markdown.js";
 import {
   frontendConfig,
+  getRedirectToInstanceUrl,
   instanceDescription,
   instanceRules,
 } from "../lib/config.js";
@@ -211,6 +212,13 @@ router.use(getConfigMiddleware);
 router.get("/", (_: Request, res: Response) => {
   if (res.locals.config?.general.show_public_event_list) {
     return res.redirect("/events");
+  }
+  // With no public event list to show, the home page is just a description of
+  // Gathio - so if this instance points elsewhere for event creation, send
+  // visitors straight there. /about keeps serving the description locally.
+  const redirectToInstance = getRedirectToInstanceUrl(res.locals.config);
+  if (redirectToInstance) {
+    return res.redirect(redirectToInstance);
   }
   return res.render("home", {
     ...frontendConfig(res),

@@ -25,6 +25,7 @@ export interface GathioConfig {
     max_comment_length: number;
     mail_service: "nodemailer" | "sendgrid" | "mailgun" | "none";
     creator_email_addresses: string[];
+    redirect_to_instance?: string;
   };
   database: {
     mongodb_url: string;
@@ -56,6 +57,7 @@ interface FrontendConfig {
   showPublicEventList: boolean;
   showInstanceInformation: boolean;
   maxCommentLength: number;
+  redirectToInstance: string | null;
   staticPages?: StaticPage[];
   version: string;
 }
@@ -76,6 +78,7 @@ const defaultConfig: GathioConfig = {
     max_comment_length: DEFAULT_MAX_COMMENT_LENGTH,
     mail_service: "none",
     creator_email_addresses: [],
+    redirect_to_instance: "",
   },
   database: {
     mongodb_url: "mongodb://localhost:27017/gathio",
@@ -94,6 +97,7 @@ export const frontendConfig = (res: Response): FrontendConfig => {
       showKofi: defaultConfig.general.show_kofi,
       showInstanceInformation: false,
       maxCommentLength: getMaxCommentLength(),
+      redirectToInstance: null,
       staticPages: [],
       version: process.env.npm_package_version || "unknown",
     };
@@ -107,6 +111,7 @@ export const frontendConfig = (res: Response): FrontendConfig => {
     showKofi: !!config.general.show_kofi,
     showInstanceInformation: !!config.static_pages?.length,
     maxCommentLength: getMaxCommentLength(config),
+    redirectToInstance: getRedirectToInstanceUrl(config),
     staticPages: config.static_pages,
     version: process.env.npm_package_version || "unknown",
   };
@@ -125,6 +130,27 @@ export const getMaxCommentLength = (
     return DEFAULT_MAX_COMMENT_LENGTH;
   }
   return value;
+};
+
+// The URL of another Gathio instance to send would-be event creators to, or
+// null if this instance doesn't point anywhere. Trailing slashes are stripped
+// because callers append paths to it, and a value which isn't an absolute
+// http(s) URL is ignored rather than being written into a link.
+export const getRedirectToInstanceUrl = (
+  config: Pick<GathioConfig, "general"> | null = null,
+): string | null => {
+  const value = config?.general.redirect_to_instance;
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+  const url = value.trim().replace(/\/+$/, "");
+  if (!/^https?:\/\//i.test(url)) {
+    console.warn(
+      `Ignoring redirect_to_instance "${value}": it must be an absolute http(s) URL.`,
+    );
+    return null;
+  }
+  return url;
 };
 
 interface InstanceRule {

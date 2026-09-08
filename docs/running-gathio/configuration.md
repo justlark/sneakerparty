@@ -17,6 +17,25 @@ Gathio is configured through a config file located at `config/config.toml`. The 
 | `show_public_event_list`  | false                 | Show a list of events and groups on the front page which have been marked as 'Display this event/group on the public event/group list'. This list becomes the home page, and the about page with information on Gathio remains available at `/about`. |
 | `mail_service`            | "nodemailer"          | Which mail service to use to send emails to hosts and attendees. Options are 'nodemailer' or 'sendgrid'.                                                                                                                                              |
 | `creator_email_addresses` | []                    | An array of email addresses which are permitted to create events. If this is empty, anyone can create events. For example: ["test@test.com", "admin@test.com"]                                                                                        |
+| `redirect_to_instance`    | ""                    | The URL of another Gathio instance to send would-be event creators to. See below. For example: "https://gath.io"                                                                                                                                      |
+
+### Pointing people at another instance
+
+If you restrict event creation with `creator_email_addresses`, anyone else who
+tries to create an event here reaches a dead end: they can request a magic link,
+but one will never arrive. Setting `redirect_to_instance` to the URL of an
+instance which does accept public signups sends them somewhere useful instead.
+
+When it's set:
+
+- The home page (`/`) redirects there. If `show_public_event_list` is `true`,
+  the public event list remains the home page and only the button below changes.
+- The 'Create an event' button links to `<redirect_to_instance>/new`.
+- `/new` still works on this instance, so permitted creators can request a magic
+  link there as usual. Nothing links to it any more, so bookmark it.
+
+The value must be an absolute `http://` or `https://` URL; anything else is
+ignored with a warning on startup.
 
 ## `[database]` section
 
