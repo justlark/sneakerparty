@@ -112,6 +112,11 @@ describe("Events", () => {
     cy.get("#commentContent").type("Test Comment");
     cy.get("#postComment").click();
     cy.get(".comment").should("contain.text", "Test Comment");
+    // Posting a comment redirects to the event URL *without* the editing
+    // token, so the page's on-load script finds the token in localStorage and
+    // navigates a second time to re-add it. Wait that out - otherwise the
+    // reload lands mid-test and closes the reply box we just opened.
+    cy.url().should("include", this.editToken);
 
     cy.get(".comment .openReplyBox").first().click();
     cy.get(".comment #replyAuthor").type("Reply Author");
@@ -204,6 +209,10 @@ describe("Events", () => {
 
   it("edits an event", function () {
     cy.get("#editEvent").click();
+    cy.get("#editModal").should("be.visible");
+    // Wait out Bootstrap's fade transition, which ends by focusing the modal
+    // element and so swallows any keystrokes typed mid-transition
+    cy.get("#editModal").should("have.focus");
 
     // The edit form is the same as the new form, so we can just re-use the same selectors
     // but we need to clear the fields first
@@ -279,6 +288,11 @@ describe("Events", () => {
     const startedEventEnd = toDatetimeLocalUTC(new Date(Date.now() + oneHour));
 
     cy.get("#editEvent").click();
+    cy.get("#editModal").should("be.visible");
+    // Wait out Bootstrap's fade transition, which ends by focusing the modal
+    // element and so swallows any keystrokes typed mid-transition - this is
+    // what truncated the name to "Edited Whil" on slower runners
+    cy.get("#editModal").should("have.focus");
 
     cy.get("#editEventForm #eventName").focus();
     cy.get("#editEventForm #eventName").clear();
