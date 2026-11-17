@@ -23,6 +23,7 @@ export interface GathioConfig {
     show_kofi: boolean;
     show_public_event_list: boolean;
     max_comment_length: number;
+    allow_comments_after_event_default: boolean;
     mail_service: "nodemailer" | "sendgrid" | "mailgun" | "none";
     creator_email_addresses: string[];
     redirect_to_instance?: string;
@@ -58,6 +59,7 @@ interface FrontendConfig {
   showInstanceInformation: boolean;
   maxCommentLength: number;
   redirectToInstance: string | null;
+  allowCommentsAfterEventDefault: boolean;
   staticPages?: StaticPage[];
   version: string;
 }
@@ -76,6 +78,7 @@ const defaultConfig: GathioConfig = {
     show_public_event_list: false,
     show_kofi: false,
     max_comment_length: DEFAULT_MAX_COMMENT_LENGTH,
+    allow_comments_after_event_default: true,
     mail_service: "none",
     creator_email_addresses: [],
     redirect_to_instance: "",
@@ -98,6 +101,8 @@ export const frontendConfig = (res: Response): FrontendConfig => {
       showInstanceInformation: false,
       maxCommentLength: getMaxCommentLength(),
       redirectToInstance: null,
+      allowCommentsAfterEventDefault:
+        defaultConfig.general.allow_comments_after_event_default,
       staticPages: [],
       version: process.env.npm_package_version || "unknown",
     };
@@ -112,6 +117,11 @@ export const frontendConfig = (res: Response): FrontendConfig => {
     showInstanceInformation: !!config.static_pages?.length,
     maxCommentLength: getMaxCommentLength(config),
     redirectToInstance: getRedirectToInstanceUrl(config),
+    // True (on) unless explicitly switched off, to support backwards
+    // compatibility for instances that don't have this entry in their
+    // config file (because it was added later)
+    allowCommentsAfterEventDefault:
+      config.general.allow_comments_after_event_default !== false,
     staticPages: config.static_pages,
     version: process.env.npm_package_version || "unknown",
   };
@@ -164,48 +174,48 @@ export const instanceRules = (): InstanceRule[] => {
   rules.push(
     config.general.show_public_event_list
       ? {
-          text: i18next.t("config.instancerule.showpubliceventlist-true"),
-          icon: "fas fa-eye",
-        }
+        text: i18next.t("config.instancerule.showpubliceventlist-true"),
+        icon: "fas fa-eye",
+      }
       : {
-          text: i18next.t("config.instancerule.showpubliceventlist-false"),
-          icon: "fas fa-eye-slash",
-        },
+        text: i18next.t("config.instancerule.showpubliceventlist-false"),
+        icon: "fas fa-eye-slash",
+      },
   );
   rules.push(
     config.general.creator_email_addresses?.length
       ? {
-          text: i18next.t("config.instancerule.creatoremail-true"),
-          icon: "fas fa-user-check",
-        }
+        text: i18next.t("config.instancerule.creatoremail-true"),
+        icon: "fas fa-user-check",
+      }
       : {
-          text: i18next.t("config.instancerule.creatoremail-false"),
-          icon: "fas fa-users",
-        },
+        text: i18next.t("config.instancerule.creatoremail-false"),
+        icon: "fas fa-users",
+      },
   );
   rules.push(
     config.general.delete_after_days > 0
       ? {
-          text: i18next.t("config.instancerule.deleteafterdays-true", {
-            days: config.general.delete_after_days,
-          }),
-          icon: "far fa-calendar-times",
-        }
+        text: i18next.t("config.instancerule.deleteafterdays-true", {
+          days: config.general.delete_after_days,
+        }),
+        icon: "far fa-calendar-times",
+      }
       : {
-          text: i18next.t("config.instancerule.deleteafterdays-false"),
-          icon: "far fa-calendar-check",
-        },
+        text: i18next.t("config.instancerule.deleteafterdays-false"),
+        icon: "far fa-calendar-check",
+      },
   );
   rules.push(
     config.general.is_federated
       ? {
-          text: i18next.t("config.instancerule.isfederated-true"),
-          icon: "fas fa-globe",
-        }
+        text: i18next.t("config.instancerule.isfederated-true"),
+        icon: "fas fa-globe",
+      }
       : {
-          text: i18next.t("config.instancerule.isfederated-false"),
-          icon: "fas fa-globe",
-        },
+        text: i18next.t("config.instancerule.isfederated-false"),
+        icon: "fas fa-globe",
+      },
   );
   return rules;
 };

@@ -18,6 +18,7 @@ import {
   broadcastDeleteMessage,
 } from "./activitypub.js";
 import Event from "./models/Event.js";
+import { eventAcceptsComments } from "./lib/event.js";
 import EventGroup from "./models/EventGroup.js";
 import path from "path";
 import i18next from "i18next";
@@ -615,7 +616,7 @@ router.post("/subscribe/:eventGroupID", async (req, res) => {
       return res.sendStatus(404);
     }
     eventGroup.subscribers.push(subscriber);
-    eventGroup.save();
+    await eventGroup.save();
 
     try {
       await req.emailService.sendEmailFromTemplate({
@@ -629,11 +630,8 @@ router.post("/subscribe/:eventGroupID", async (req, res) => {
         },
       });
     } catch (e) {
-      console.error(
-        "error sending removeEventAttendeeHtml email",
-        e.toString(),
-      );
-      res.status(500).end();
+      console.error("error sending subscribed email", e.toString());
+      return res.status(500).end();
     }
 
     return res.redirect(`/group/${eventGroup.id}`);
@@ -721,6 +719,9 @@ router.post("/post/comment/:eventID", (req, res) => {
       }
       if (!event) {
         return res.sendStatus(404);
+      }
+      if (!eventAcceptsComments(event)) {
+        return res.status(403).send(i18next.t("routes.commentsclosed"));
       }
       event.comments.push(newComment);
 
@@ -823,6 +824,9 @@ router.post("/post/reply/:eventID/:commentID", (req, res) => {
     async function (err, event) {
       if (!event) {
         return res.sendStatus(404);
+      }
+      if (!eventAcceptsComments(event)) {
+        return res.status(403).send(i18next.t("routes.commentsclosed"));
       }
       var parentComment = event.comments.id(commentID);
       parentComment.replies.push(newReply);
