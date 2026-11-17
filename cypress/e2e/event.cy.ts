@@ -189,8 +189,9 @@ describe("Events", () => {
 
   it("responds correctly to ActivityPub webfinger requests", function () {
     cy.request({
-      url: `/.well-known/webfinger?resource=acct:${this.eventID
-        }@${Cypress.env("CYPRESS_DOMAIN")}`,
+      url: `/.well-known/webfinger?resource=acct:${
+        this.eventID
+      }@${Cypress.env("CYPRESS_DOMAIN")}`,
       headers: {
         Accept:
           'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',

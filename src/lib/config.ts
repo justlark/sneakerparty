@@ -174,48 +174,48 @@ export const instanceRules = (): InstanceRule[] => {
   rules.push(
     config.general.show_public_event_list
       ? {
-        text: i18next.t("config.instancerule.showpubliceventlist-true"),
-        icon: "fas fa-eye",
-      }
+          text: i18next.t("config.instancerule.showpubliceventlist-true"),
+          icon: "fas fa-eye",
+        }
       : {
-        text: i18next.t("config.instancerule.showpubliceventlist-false"),
-        icon: "fas fa-eye-slash",
-      },
+          text: i18next.t("config.instancerule.showpubliceventlist-false"),
+          icon: "fas fa-eye-slash",
+        },
   );
   rules.push(
     config.general.creator_email_addresses?.length
       ? {
-        text: i18next.t("config.instancerule.creatoremail-true"),
-        icon: "fas fa-user-check",
-      }
+          text: i18next.t("config.instancerule.creatoremail-true"),
+          icon: "fas fa-user-check",
+        }
       : {
-        text: i18next.t("config.instancerule.creatoremail-false"),
-        icon: "fas fa-users",
-      },
+          text: i18next.t("config.instancerule.creatoremail-false"),
+          icon: "fas fa-users",
+        },
   );
   rules.push(
     config.general.delete_after_days > 0
       ? {
-        text: i18next.t("config.instancerule.deleteafterdays-true", {
-          days: config.general.delete_after_days,
-        }),
-        icon: "far fa-calendar-times",
-      }
+          text: i18next.t("config.instancerule.deleteafterdays-true", {
+            days: config.general.delete_after_days,
+          }),
+          icon: "far fa-calendar-times",
+        }
       : {
-        text: i18next.t("config.instancerule.deleteafterdays-false"),
-        icon: "far fa-calendar-check",
-      },
+          text: i18next.t("config.instancerule.deleteafterdays-false"),
+          icon: "far fa-calendar-check",
+        },
   );
   rules.push(
     config.general.is_federated
       ? {
-        text: i18next.t("config.instancerule.isfederated-true"),
-        icon: "fas fa-globe",
-      }
+          text: i18next.t("config.instancerule.isfederated-true"),
+          icon: "fas fa-globe",
+        }
       : {
-        text: i18next.t("config.instancerule.isfederated-false"),
-        icon: "fas fa-globe",
-      },
+          text: i18next.t("config.instancerule.isfederated-false"),
+          icon: "fas fa-globe",
+        },
   );
   return rules;
 };
